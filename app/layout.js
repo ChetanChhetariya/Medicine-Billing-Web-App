@@ -1,7 +1,7 @@
 import './globals.css'
 
 export const metadata = {
-  title: 'Medicine Billing System',
+  title: 'Dwarkesh Medical',
   description: 'Professional pharmacy management system with beautiful UI',
 }
 

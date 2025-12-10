@@ -12,12 +12,12 @@ const InvoiceSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  phone: {
+  customerPhone: {  // Changed from 'phone'
     type: String,
     required: true,
     trim: true
   },
-  medicines: [{
+  items: [{  // Changed from 'medicines'
     medicineId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Medicine'
@@ -25,8 +25,16 @@ const InvoiceSchema = new mongoose.Schema({
     medicineName: String,
     quantity: Number,
     price: Number,
-    total: Number
+    subtotal: Number  // Changed from 'total'
   }],
+  subtotal: {
+    type: Number,
+    default: 0
+  },
+  discount: {
+    type: Number,
+    default: 0
+  },
   totalAmount: {
     type: Number,
     required: true,
@@ -34,17 +42,13 @@ const InvoiceSchema = new mongoose.Schema({
   },
   paymentMethod: {
     type: String,
-    enum: ['Cash', 'Card', 'UPI', 'Online'],
+    enum: ['Cash', 'Card', 'UPI'],
     default: 'Cash'
   },
   status: {
     type: String,
-    enum: ['Pending', 'Completed', 'Cancelled'],
+    enum: ['Pending', 'Paid', 'Cancelled'],
     default: 'Pending'
-  },
-  date: {
-    type: Date,
-    default: Date.now
   }
 }, {
   timestamps: true

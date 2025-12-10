@@ -1,44 +1,51 @@
 import mongoose from 'mongoose';
 
-const MedicineSchema = new mongoose.Schema({
+const medicineSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
+    required: [true, 'Medicine name is required'],
     trim: true
   },
-  manufacturer: {
+  agency: {
     type: String,
-    trim: true
-  },
-  category: {
-    type: String,
+    required: [true, 'Agency/Manufacturer is required'],
     trim: true
   },
   batchNumber: {
     type: String,
-    required: true,
+    required: [true, 'Batch number is required'],
     trim: true
   },
   expiryDate: {
     type: Date,
-    required: true
+    required: [true, 'Expiry date is required']
   },
   quantity: {
     type: Number,
-    required: true,
-    min: 0
+    required: [true, 'Quantity is required'],
+    min: [0, 'Quantity cannot be negative'],
+    default: 0
   },
   price: {
     type: Number,
-    required: true,
-    min: 0
+    required: [true, 'Price is required'],
+    min: [0, 'Price cannot be negative']
   },
   description: {
     type: String,
-    trim: true
+    trim: true,
+    default: ''
   }
 }, {
   timestamps: true
 });
 
-export default mongoose.models.Medicine || mongoose.model('Medicine', MedicineSchema);
+// Create indexes for better query performance
+medicineSchema.index({ name: 1 });
+medicineSchema.index({ batchNumber: 1 });
+medicineSchema.index({ expiryDate: 1 });
+
+// Check if model already exists before creating it
+const Medicine = mongoose.models.Medicine || mongoose.model('Medicine', medicineSchema);
+
+export default Medicine;

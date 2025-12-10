@@ -64,7 +64,7 @@ export default function Dashboard() {
         <img 
         src="/medicallogo.jpg" 
         alt="Dwarkesh Medical" 
-        style={{ height: '70px', width: 'auto' }}
+        style={{ height: '100px', width: '220px' }}
         />
         </div>
 

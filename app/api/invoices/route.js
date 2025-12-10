@@ -13,8 +13,8 @@ export async function POST(req) {
     const {
       invoiceNumber,
       customerName,
-      customerPhone,  // Changed from 'phone'
-      items,          // Changed from 'medicines'
+      customerPhone,
+      items,
       totalAmount,
       paymentMethod,
       discount,
@@ -61,8 +61,8 @@ export async function POST(req) {
     const invoice = await Invoice.create({
       invoiceNumber,
       customerName,
-      customerPhone,  // Use customerPhone
-      items,          // Use items
+      customerPhone,
+      items,
       subtotal: Number(subtotal || 0),
       discount: Number(discount || 0),
       totalAmount: Number(totalAmount),

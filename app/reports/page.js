@@ -3,13 +3,14 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { ArrowLeft, Printer, Calendar } from 'lucide-react';
 
 export default function ReportsPage() {
   const router = useRouter();
   const [invoices, setInvoices] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('all'); // all, today, week, month, custom
+  const [filter, setFilter] = useState('all');
   const [customDates, setCustomDates] = useState({
     startDate: '',
     endDate: ''
@@ -24,14 +25,12 @@ export default function ReportsPage() {
     try {
       setLoading(true);
       
-      // Fetch invoices
       const invoicesRes = await fetch('/api/invoices');
       const invoicesData = await invoicesRes.json();
       if (invoicesData.success) {
         setInvoices(invoicesData.data);
       }
 
-      // Fetch dashboard stats
       const statsRes = await fetch('/api/dashboard/stats');
       const statsData = await statsRes.json();
       if (statsData.success) {
@@ -66,7 +65,7 @@ export default function ReportsPage() {
           const end = customDates.endDate ? new Date(customDates.endDate) : null;
           
           if (start && end) {
-            end.setHours(23, 59, 59, 999); // Include end date fully
+            end.setHours(23, 59, 59, 999);
             return invoiceDate >= start && invoiceDate <= end;
           } else if (start) {
             return invoiceDate >= start;
@@ -127,142 +126,193 @@ export default function ReportsPage() {
     window.print();
   };
 
-  if (loading) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <p style={{ fontSize: '1.25rem', color: '#6b7280' }}>Loading reports...</p>
-      </div>
-    );
-  }
-
   const filteredStats = calculateStats();
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb' }}>
-      <header style={{ 
-        backgroundColor: '#fff', 
-        borderBottom: '1px solid #e5e7eb',
-        padding: '1rem 2rem',
-        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
-      }} className="no-print">
-        <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Link href="/" style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1f2937', textDecoration: 'none' }}>
-            🏥 Dwarkesh Medical
-          </Link>
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <Link href="/" style={{ padding: '0.5rem 1rem', backgroundColor: '#6b7280', color: '#fff', textDecoration: 'none', borderRadius: '6px' }}>
-              🏠 Dashboard
-            </Link>
-            <Link href="/medicines" style={{ padding: '0.5rem 1rem', backgroundColor: '#3b82f6', color: '#fff', textDecoration: 'none', borderRadius: '6px' }}>
-              💊 Medicines
-            </Link>
-            <Link href="/invoices" style={{ padding: '0.5rem 1rem', backgroundColor: '#10b981', color: '#fff', textDecoration: 'none', borderRadius: '6px' }}>
-              🧾 Invoices
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem' }}>
-        {/* Back to Dashboard Button */}
-        <button
-          onClick={() => router.push('/')}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            backgroundColor: 'transparent',
-            border: '1px solid #d1d5db',
-            color: '#374151',
-            padding: '8px 16px',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: '500',
-            marginBottom: '16px',
-            transition: 'all 0.2s'
-          }}
-          className="no-print"
-          onMouseOver={(e) => {
-            e.currentTarget.style.backgroundColor = '#f3f4f6';
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.backgroundColor = 'transparent';
-          }}
+    <div style={{ minHeight: '100vh', backgroundColor: '#F8FAFC', padding: '2rem' }}>
+      {/* Back Button */}
+      <div style={{ marginBottom: '1.5rem' }} className="no-print">
+        <Link href="/" style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          padding: '0.75rem 1.5rem',
+          backgroundColor: '#FFFFFF',
+          borderRadius: '10px',
+          textDecoration: 'none',
+          color: '#475569',
+          fontWeight: '600',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+          border: '1px solid #E2E8F0',
+          transition: 'all 0.2s'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = '#F1F5F9';
+          e.currentTarget.style.transform = 'translateY(-1px)';
+          e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.07)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = '#FFFFFF';
+          e.currentTarget.style.transform = 'translateY(0)';
+          e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.05)';
+        }}
         >
-          ← Back to Dashboard
-        </button>
+          <ArrowLeft size={20} />
+          Back to Dashboard
+        </Link>
+      </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }} className="no-print">
-          <h2 style={{ fontSize: '1.875rem', fontWeight: '600', color: '#1f2937' }}>📊 Sales Reports</h2>
+      {/* Header */}
+      <div style={{
+        backgroundColor: '#FFFFFF',
+        borderRadius: '16px',
+        padding: '2rem',
+        marginBottom: '2rem',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+        border: '1px solid #E2E8F0'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{
+              width: '56px',
+              height: '56px',
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#fff',
+              fontSize: '1.75rem'
+            }}>
+              📊
+            </div>
+            <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#0F172A', margin: 0 }}>
+              Sales Reports
+            </h1>
+          </div>
           <button
             onClick={printReport}
+            className="no-print"
             style={{
-              padding: '0.75rem 1.5rem',
-              backgroundColor: '#8b5cf6',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.875rem 1.75rem',
+              background: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)',
               color: '#fff',
+              textDecoration: 'none',
+              borderRadius: '10px',
+              fontWeight: '600',
+              boxShadow: '0 4px 12px rgba(139, 92, 246, 0.25)',
+              transition: 'all 0.2s',
               border: 'none',
-              borderRadius: '6px',
-              fontSize: '1rem',
-              fontWeight: '500',
               cursor: 'pointer'
             }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(139, 92, 246, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(139, 92, 246, 0.25)';
+            }}
           >
-            🖨️ Print Report
+            <Printer size={20} />
+            Print Report
           </button>
         </div>
+      </div>
 
-        {/* Filter Buttons */}
-        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', flexWrap: 'wrap' }} className="no-print">
-          {['all', 'today', 'week', 'month'].map(f => (
+      {/* Filter Buttons */}
+      <div style={{
+        backgroundColor: '#FFFFFF',
+        borderRadius: '16px',
+        padding: '1.5rem',
+        marginBottom: '2rem',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+        border: '1px solid #E2E8F0'
+      }} className="no-print">
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: showCustomRange ? '1.5rem' : '0' }}>
+          {[
+            { value: 'all', label: 'All Time' },
+            { value: 'today', label: 'Today' },
+            { value: 'week', label: 'Last 7 Days' },
+            { value: 'month', label: 'Last 30 Days' }
+          ].map(f => (
             <button
-              key={f}
-              onClick={() => handleFilterChange(f)}
+              key={f.value}
+              onClick={() => handleFilterChange(f.value)}
               style={{
-                padding: '0.5rem 1rem',
-                backgroundColor: filter === f ? '#8b5cf6' : '#fff',
-                color: filter === f ? '#fff' : '#6b7280',
-                border: '1px solid #e5e7eb',
-                borderRadius: '6px',
+                padding: '0.625rem 1.25rem',
+                backgroundColor: filter === f.value ? '#8B5CF6' : '#F1F5F9',
+                color: filter === f.value ? '#FFFFFF' : '#475569',
+                border: '2px solid',
+                borderColor: filter === f.value ? '#8B5CF6' : '#E2E8F0',
+                borderRadius: '10px',
                 cursor: 'pointer',
-                fontWeight: filter === f ? '600' : '400',
-                textTransform: 'capitalize'
+                fontWeight: '600',
+                fontSize: '0.9375rem',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                if (filter !== f.value) {
+                  e.currentTarget.style.backgroundColor = '#E2E8F0';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (filter !== f.value) {
+                  e.currentTarget.style.backgroundColor = '#F1F5F9';
+                }
               }}
             >
-              {f === 'all' ? 'All Time' : f === 'today' ? 'Today' : f === 'week' ? 'Last 7 Days' : 'Last 30 Days'}
+              {f.label}
             </button>
           ))}
           <button
             onClick={() => handleFilterChange('custom')}
             style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: filter === 'custom' ? '#8b5cf6' : '#fff',
-              color: filter === 'custom' ? '#fff' : '#6b7280',
-              border: '1px solid #e5e7eb',
-              borderRadius: '6px',
+              padding: '0.625rem 1.25rem',
+              backgroundColor: filter === 'custom' ? '#8B5CF6' : '#F1F5F9',
+              color: filter === 'custom' ? '#FFFFFF' : '#475569',
+              border: '2px solid',
+              borderColor: filter === 'custom' ? '#8B5CF6' : '#E2E8F0',
+              borderRadius: '10px',
               cursor: 'pointer',
-              fontWeight: filter === 'custom' ? '600' : '400'
+              fontWeight: '600',
+              fontSize: '0.9375rem',
+              transition: 'all 0.2s',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}
+            onMouseEnter={(e) => {
+              if (filter !== 'custom') {
+                e.currentTarget.style.backgroundColor = '#E2E8F0';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (filter !== 'custom') {
+                e.currentTarget.style.backgroundColor = '#F1F5F9';
+              }
             }}
           >
-            📅 Custom Range
+            <Calendar size={16} />
+            Custom Range
           </button>
         </div>
 
         {/* Custom Date Range Picker */}
         {showCustomRange && (
           <div style={{ 
-            backgroundColor: '#fff', 
-            padding: '1.5rem', 
-            borderRadius: '8px', 
-            marginBottom: '1.5rem',
-            boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
-          }} className="no-print">
-            <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem', color: '#1f2937' }}>
+            paddingTop: '1.5rem',
+            borderTop: '1px solid #E2E8F0'
+          }}>
+            <h3 style={{ fontSize: '0.9375rem', fontWeight: '700', marginBottom: '1rem', color: '#475569' }}>
               Select Custom Date Range
             </h3>
-            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <label style={{ fontSize: '0.875rem', color: '#6b7280', fontWeight: '500' }}>
+                <label style={{ fontSize: '0.875rem', color: '#64748B', fontWeight: '600' }}>
                   Start Date
                 </label>
                 <input
@@ -270,15 +320,18 @@ export default function ReportsPage() {
                   value={customDates.startDate}
                   onChange={(e) => setCustomDates({ ...customDates, startDate: e.target.value })}
                   style={{
-                    padding: '0.5rem',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '6px',
-                    fontSize: '0.875rem'
+                    padding: '0.625rem',
+                    border: '2px solid #E2E8F0',
+                    borderRadius: '8px',
+                    fontSize: '0.9375rem',
+                    outline: 'none',
+                    backgroundColor: '#FFFFFF',
+                    color: '#0F172A'
                   }}
                 />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <label style={{ fontSize: '0.875rem', color: '#6b7280', fontWeight: '500' }}>
+                <label style={{ fontSize: '0.875rem', color: '#64748B', fontWeight: '600' }}>
                   End Date
                 </label>
                 <input
@@ -286,25 +339,35 @@ export default function ReportsPage() {
                   value={customDates.endDate}
                   onChange={(e) => setCustomDates({ ...customDates, endDate: e.target.value })}
                   style={{
-                    padding: '0.5rem',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '6px',
-                    fontSize: '0.875rem'
+                    padding: '0.625rem',
+                    border: '2px solid #E2E8F0',
+                    borderRadius: '8px',
+                    fontSize: '0.9375rem',
+                    outline: 'none',
+                    backgroundColor: '#FFFFFF',
+                    color: '#0F172A'
                   }}
                 />
               </div>
-              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end' }}>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
                 <button
                   onClick={applyCustomRange}
                   style={{
-                    padding: '0.5rem 1rem',
-                    backgroundColor: '#10b981',
+                    padding: '0.625rem 1.25rem',
+                    backgroundColor: '#10B981',
                     color: '#fff',
                     border: 'none',
-                    borderRadius: '6px',
+                    borderRadius: '8px',
                     cursor: 'pointer',
-                    fontSize: '0.875rem',
-                    fontWeight: '500'
+                    fontSize: '0.9375rem',
+                    fontWeight: '600',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#059669';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#10B981';
                   }}
                 >
                   Apply
@@ -312,14 +375,21 @@ export default function ReportsPage() {
                 <button
                   onClick={clearCustomRange}
                   style={{
-                    padding: '0.5rem 1rem',
-                    backgroundColor: '#ef4444',
+                    padding: '0.625rem 1.25rem',
+                    backgroundColor: '#EF4444',
                     color: '#fff',
                     border: 'none',
-                    borderRadius: '6px',
+                    borderRadius: '8px',
                     cursor: 'pointer',
-                    fontSize: '0.875rem',
-                    fontWeight: '500'
+                    fontSize: '0.9375rem',
+                    fontWeight: '600',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#DC2626';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#EF4444';
                   }}
                 >
                   Clear
@@ -327,8 +397,14 @@ export default function ReportsPage() {
               </div>
             </div>
             {filter === 'custom' && (customDates.startDate || customDates.endDate) && (
-              <div style={{ marginTop: '1rem', padding: '0.75rem', backgroundColor: '#dbeafe', borderRadius: '6px' }}>
-                <p style={{ fontSize: '0.875rem', color: '#1e40af', margin: 0 }}>
+              <div style={{ 
+                marginTop: '1rem', 
+                padding: '0.875rem 1.25rem', 
+                backgroundColor: '#DBEAFE', 
+                borderRadius: '10px',
+                border: '1px solid #93C5FD'
+              }}>
+                <p style={{ fontSize: '0.9375rem', color: '#1E40AF', margin: 0, fontWeight: '500' }}>
                   📊 Showing data from{' '}
                   <strong>{customDates.startDate || 'beginning'}</strong> to{' '}
                   <strong>{customDates.endDate || 'today'}</strong>
@@ -337,84 +413,220 @@ export default function ReportsPage() {
             )}
           </div>
         )}
+      </div>
 
-        {/* Statistics Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-          <div style={{ backgroundColor: '#fff', padding: '1.5rem', borderRadius: '8px', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)' }}>
-            <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem' }}>Total Revenue</div>
-            <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#10b981' }}>
-              ₹{filteredStats.totalRevenue.toFixed(2)}
-            </div>
-          </div>
-
-          <div style={{ backgroundColor: '#fff', padding: '1.5rem', borderRadius: '8px', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)' }}>
-            <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem' }}>Total Invoices</div>
-            <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#3b82f6' }}>
-              {filteredStats.totalInvoices}
-            </div>
-          </div>
-
-          <div style={{ backgroundColor: '#fff', padding: '1.5rem', borderRadius: '8px', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)' }}>
-            <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem' }}>Avg Invoice Value</div>
-            <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#8b5cf6' }}>
-              ₹{filteredStats.avgInvoiceValue.toFixed(2)}
-            </div>
-          </div>
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '4rem', color: '#94A3B8' }}>
+          <div style={{ 
+            display: 'inline-block',
+            width: '48px',
+            height: '48px',
+            border: '4px solid #E2E8F0',
+            borderTop: '4px solid #8B5CF6',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite'
+          }}></div>
+          <p style={{ marginTop: '1.5rem', fontSize: '1.125rem', fontWeight: '500' }}>Loading reports...</p>
+          <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); }}`}</style>
         </div>
-
-        {/* Payment Methods Breakdown */}
-        <div style={{ backgroundColor: '#fff', borderRadius: '8px', padding: '1.5rem', marginBottom: '2rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)' }}>
-          <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem' }}>Payment Methods</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem' }}>
-            {Object.entries(filteredStats.paymentMethods).map(([method, count]) => (
-              <div key={method} style={{ padding: '1rem', backgroundColor: '#f9fafb', borderRadius: '6px' }}>
-                <div style={{ fontSize: '0.875rem', color: '#6b7280', textTransform: 'capitalize' }}>{method}</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1f2937' }}>{count}</div>
+      ) : (
+        <>
+          {/* Statistics Cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+            <div style={{ 
+              backgroundColor: '#FFFFFF', 
+              padding: '1.75rem', 
+              borderRadius: '16px', 
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+              border: '1px solid #E2E8F0',
+              borderLeft: '4px solid #10B981'
+            }}>
+              <div style={{ fontSize: '0.875rem', color: '#64748B', marginBottom: '0.75rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Total Revenue
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Invoices Table */}
-        <div style={{ backgroundColor: '#fff', borderRadius: '8px', padding: '1.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)' }}>
-          <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem' }}>Invoice Details</h3>
-          
-          {getFilteredInvoices().length === 0 ? (
-            <p style={{ textAlign: 'center', padding: '2rem', color: '#6b7280' }}>No invoices found for the selected period</p>
-          ) : (
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ borderBottom: '2px solid #e5e7eb' }}>
-                    <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '600', color: '#6b7280' }}>Invoice #</th>
-                    <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '600', color: '#6b7280' }}>Customer</th>
-                    <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '600', color: '#6b7280' }}>Phone</th>
-                    <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '600', color: '#6b7280' }}>Amount</th>
-                    <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '600', color: '#6b7280' }}>Payment</th>
-                    <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '600', color: '#6b7280' }}>Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {getFilteredInvoices().map((invoice) => (
-                    <tr key={invoice._id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                      <td style={{ padding: '0.75rem', fontWeight: '500' }}>{invoice.invoiceNumber}</td>
-                      <td style={{ padding: '0.75rem' }}>{invoice.patientName || invoice.customerName}</td>
-                      <td style={{ padding: '0.75rem' }}>{invoice.patientContact || invoice.customerPhone}</td>
-                      <td style={{ padding: '0.75rem', fontWeight: '600', color: '#10b981' }}>
-                        ₹{(invoice.grandTotal || invoice.totalAmount).toFixed(2)}
-                      </td>
-                      <td style={{ padding: '0.75rem', textTransform: 'capitalize' }}>{invoice.paymentMethod}</td>
-                      <td style={{ padding: '0.75rem' }}>
-                        {new Date(invoice.createdAt).toLocaleDateString()}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div style={{ fontSize: '2rem', fontWeight: '700', color: '#10B981' }}>
+                ₹{filteredStats.totalRevenue.toFixed(2)}
+              </div>
             </div>
-          )}
-        </div>
-      </main>
+
+            <div style={{ 
+              backgroundColor: '#FFFFFF', 
+              padding: '1.75rem', 
+              borderRadius: '16px', 
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+              border: '1px solid #E2E8F0',
+              borderLeft: '4px solid #0EA5E9'
+            }}>
+              <div style={{ fontSize: '0.875rem', color: '#64748B', marginBottom: '0.75rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Total Invoices
+              </div>
+              <div style={{ fontSize: '2rem', fontWeight: '700', color: '#0EA5E9' }}>
+                {filteredStats.totalInvoices}
+              </div>
+            </div>
+
+            <div style={{ 
+              backgroundColor: '#FFFFFF', 
+              padding: '1.75rem', 
+              borderRadius: '16px', 
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+              border: '1px solid #E2E8F0',
+              borderLeft: '4px solid #8B5CF6'
+            }}>
+              <div style={{ fontSize: '0.875rem', color: '#64748B', marginBottom: '0.75rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Avg Invoice Value
+              </div>
+              <div style={{ fontSize: '2rem', fontWeight: '700', color: '#8B5CF6' }}>
+                ₹{filteredStats.avgInvoiceValue.toFixed(2)}
+              </div>
+            </div>
+          </div>
+
+          {/* Payment Methods Breakdown */}
+          <div style={{ 
+            backgroundColor: '#FFFFFF', 
+            borderRadius: '16px', 
+            padding: '2rem', 
+            marginBottom: '2rem', 
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+            border: '1px solid #E2E8F0'
+          }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '1.5rem', color: '#0F172A' }}>
+              Payment Methods
+            </h3>
+            {Object.keys(filteredStats.paymentMethods).length > 0 ? (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem' }}>
+                {Object.entries(filteredStats.paymentMethods).map(([method, count]) => (
+                  <div key={method} style={{ 
+                    padding: '1.25rem', 
+                    backgroundColor: '#F8FAFC', 
+                    borderRadius: '12px',
+                    border: '1px solid #E2E8F0',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#F1F5F9';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#F8FAFC';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                  >
+                    <div style={{ fontSize: '0.875rem', color: '#64748B', textTransform: 'capitalize', marginBottom: '0.5rem', fontWeight: '600' }}>
+                      {method}
+                    </div>
+                    <div style={{ fontSize: '1.75rem', fontWeight: '700', color: '#0F172A' }}>
+                      {count}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p style={{ color: '#94A3B8', textAlign: 'center', padding: '2rem' }}>No payment data available</p>
+            )}
+          </div>
+
+          {/* Invoices Table */}
+          <div style={{ 
+            backgroundColor: '#FFFFFF', 
+            borderRadius: '16px', 
+            padding: '2rem', 
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+            border: '1px solid #E2E8F0'
+          }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '1.5rem', color: '#0F172A' }}>
+              Invoice Details
+            </h3>
+            
+            {getFilteredInvoices().length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '4rem', color: '#94A3B8' }}>
+                <div style={{ fontSize: '4rem', marginBottom: '1.5rem' }}>📄</div>
+                <p style={{ fontSize: '1.25rem', fontWeight: '600', color: '#475569', marginBottom: '0.5rem' }}>
+                  No invoices found for the selected period
+                </p>
+              </div>
+            ) : (
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
+                  <thead>
+                    <tr style={{
+                      backgroundColor: '#F1F5F9',
+                      borderBottom: '2px solid #E2E8F0'
+                    }}>
+                      <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '700', color: '#475569', fontSize: '0.8125rem', textTransform: 'uppercase', letterSpacing: '0.5px', whiteSpace: 'nowrap' }}>
+                        Invoice #
+                      </th>
+                      <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '700', color: '#475569', fontSize: '0.8125rem', textTransform: 'uppercase', letterSpacing: '0.5px', whiteSpace: 'nowrap' }}>
+                        Customer
+                      </th>
+                      <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '700', color: '#475569', fontSize: '0.8125rem', textTransform: 'uppercase', letterSpacing: '0.5px', whiteSpace: 'nowrap' }}>
+                        Phone
+                      </th>
+                      <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '700', color: '#475569', fontSize: '0.8125rem', textTransform: 'uppercase', letterSpacing: '0.5px', whiteSpace: 'nowrap' }}>
+                        Amount
+                      </th>
+                      <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '700', color: '#475569', fontSize: '0.8125rem', textTransform: 'uppercase', letterSpacing: '0.5px', whiteSpace: 'nowrap' }}>
+                        Payment
+                      </th>
+                      <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '700', color: '#475569', fontSize: '0.8125rem', textTransform: 'uppercase', letterSpacing: '0.5px', whiteSpace: 'nowrap' }}>
+                        Date
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {getFilteredInvoices().map((invoice, idx) => (
+                      <tr key={invoice._id} style={{
+                        borderBottom: '1px solid #F1F5F9',
+                        transition: 'background-color 0.2s'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F8FAFC'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                      >
+                        <td style={{ padding: '1rem', fontWeight: '600', color: '#0F172A', fontSize: '0.9375rem' }}>
+                          {invoice.invoiceNumber}
+                        </td>
+                        <td style={{ padding: '1rem', color: '#475569', fontSize: '0.9375rem' }}>
+                          {invoice.patientName || invoice.customerName}
+                        </td>
+                        <td style={{ padding: '1rem', color: '#64748B', fontSize: '0.9375rem' }}>
+                          {invoice.patientContact || invoice.customerPhone}
+                        </td>
+                        <td style={{ padding: '1rem', fontWeight: '700', color: '#10B981', fontSize: '1rem' }}>
+                          ₹{(invoice.grandTotal || invoice.totalAmount).toFixed(2)}
+                        </td>
+                        <td style={{ padding: '1rem' }}>
+                          <span style={{
+                            display: 'inline-block',
+                            padding: '0.375rem 0.875rem',
+                            borderRadius: '9999px',
+                            backgroundColor: '#EEF2FF',
+                            color: '#4F46E5',
+                            fontWeight: '600',
+                            fontSize: '0.875rem',
+                            textTransform: 'capitalize'
+                          }}>
+                            {invoice.paymentMethod}
+                          </span>
+                        </td>
+                        <td style={{ padding: '1rem', color: '#64748B', fontSize: '0.9375rem' }}>
+                          {new Date(invoice.createdAt).toLocaleDateString('en-IN', { 
+                            day: '2-digit', 
+                            month: '2-digit', 
+                            year: 'numeric' 
+                          })}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </>
+      )}
 
       <style jsx global>{`
         @media print {

@@ -59,9 +59,16 @@ export default function Dashboard() {
         boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
       }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#0F172A', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            🏥 <span style={{ color: '#0EA5E9' }}>Dwarkesh</span> Medical
-          </h1>
+          {/* Logo */}
+<div style={{ display: 'flex', alignItems: 'center' }}>
+        <img 
+        src="/medicallogo.jpg" 
+        alt="Dwarkesh Medical" 
+        style={{ height: '70px', width: 'auto' }}
+        />
+        </div>
+
+          {/* Navigation */}
           <nav style={{ display: 'flex', gap: '0.75rem' }}>
             <Link href="/medicines" style={{
               padding: '0.625rem 1.25rem',

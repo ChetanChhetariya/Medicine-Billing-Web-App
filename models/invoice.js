@@ -12,12 +12,12 @@ const InvoiceSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  customerPhone: {  // Changed from 'phone'
+  customerPhone: {
     type: String,
     required: true,
     trim: true
   },
-  items: [{  // Changed from 'medicines'
+  items: [{
     medicineId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Medicine'
@@ -25,7 +25,19 @@ const InvoiceSchema = new mongoose.Schema({
     medicineName: String,
     quantity: Number,
     price: Number,
-    subtotal: Number  // Changed from 'total'
+    gstRate: {
+      type: Number,
+      default: 12  // Default GST rate 12% (6% CGST + 6% SGST)
+    },
+    cgst: {
+      type: Number,
+      default: 0
+    },
+    sgst: {
+      type: Number,
+      default: 0
+    },
+    subtotal: Number  // Total including GST
   }],
   subtotal: {
     type: Number,
@@ -42,13 +54,13 @@ const InvoiceSchema = new mongoose.Schema({
   },
   paymentMethod: {
     type: String,
-    enum: ['Cash', 'Card', 'UPI'],
+    enum: ['Cash', 'Card', 'UPI', 'POS'],
     default: 'Cash'
   },
   status: {
     type: String,
     enum: ['Pending', 'Paid', 'Cancelled'],
-    default: 'Pending'
+    default: 'Paid'
   }
 }, {
   timestamps: true

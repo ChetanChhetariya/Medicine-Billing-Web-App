@@ -2,11 +2,32 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Medicine from '@/models/medicine';
 
-// GET - Fetch all medicines
-export async function GET() {
+// GET - Fetch all medicines with optional search
+export async function GET(request) {
   try {
     await dbConnect();
-    const medicines = await Medicine.find({}).sort({ createdAt: -1 });
+    
+    // Get search query from URL parameters
+    const { searchParams } = new URL(request.url);
+    const search = searchParams.get('search') || '';
+    
+    let query = {};
+    
+    // If search query exists, filter medicines
+    if (search && search.length >= 2) {
+      query = {
+        $or: [
+          { name: { $regex: search, $options: 'i' } },
+          { agency: { $regex: search, $options: 'i' } },
+          { batchNumber: { $regex: search, $options: 'i' } }
+        ]
+      };
+    }
+    
+    const medicines = await Medicine.find(query)
+      .sort({ createdAt: -1 })
+      .limit(search ? 20 : 1000); // Limit results when searching
+    
     return NextResponse.json({ success: true, data: medicines });
   } catch (error) {
     console.error('Error fetching medicines:', error);

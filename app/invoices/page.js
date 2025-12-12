@@ -19,7 +19,6 @@ export default function InvoicesPage() {
     dateTo: ''
   });
 
-  // Fetch invoices from MongoDB
   useEffect(() => {
     fetchInvoices();
   }, []);
@@ -27,24 +26,55 @@ export default function InvoicesPage() {
   const fetchInvoices = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/invoices');
+      setError('');
       
+      console.log('Starting fetch at:', new Date().toISOString());
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
+      const response = await fetch('/api/invoices', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
+      console.log('Response received:', {
+        status: response.status,
+        ok: response.ok,
+        statusText: response.statusText
+      });
+
       if (!response.ok) {
-        throw new Error('Failed to fetch invoices');
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        console.error('Error response:', errorData);
+        throw new Error(errorData.message || `Server error: ${response.status}`);
       }
 
       const data = await response.json();
+      console.log('Data received:', data);
       
       if (data.success) {
-        setInvoices(data.data);
+        setInvoices(data.data || []);
+        console.log(`Loaded ${data.data?.length || 0} invoices`);
       } else {
-        setError(data.message || 'Failed to load invoices');
+        throw new Error(data.message || 'Failed to load invoices');
       }
     } catch (err) {
-      console.error('Error fetching invoices:', err);
-      setError('Failed to load invoices from database');
+      console.error('Fetch error:', err);
+      
+      if (err.name === 'AbortError') {
+        setError('Request timeout. Please check your internet connection and try again.');
+      } else {
+        setError(err.message || 'Failed to load invoices. Please check console for details.');
+      }
     } finally {
       setLoading(false);
+      console.log('Fetch completed');
     }
   };
 
@@ -61,7 +91,6 @@ export default function InvoicesPage() {
       const data = await response.json();
 
       if (data.success) {
-        // Refresh the list
         fetchInvoices();
       } else {
         alert(data.message || 'Failed to update status');
@@ -72,7 +101,6 @@ export default function InvoicesPage() {
     }
   };
 
-  // Filter invoices
   const filteredInvoices = invoices.filter(invoice => {
     let matchesSearch = true;
     
@@ -113,7 +141,6 @@ export default function InvoicesPage() {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#F8FAFC', padding: '2rem' }}>
-      {/* Back Button */}
       <div style={{ marginBottom: '1.5rem' }}>
         <Link href="/" style={{
           display: 'inline-flex',
@@ -145,7 +172,6 @@ export default function InvoicesPage() {
         </Link>
       </div>
 
-      {/* Header */}
       <div style={{
         backgroundColor: '#FFFFFF',
         borderRadius: '16px',
@@ -201,7 +227,6 @@ export default function InvoicesPage() {
         </div>
       </div>
 
-      {/* Error Message */}
       {error && (
         <div style={{
           backgroundColor: '#FEE2E2',
@@ -210,13 +235,36 @@ export default function InvoicesPage() {
           padding: '1rem 1.25rem',
           borderRadius: '12px',
           marginBottom: '1.5rem',
-          fontWeight: '500'
+          fontWeight: '500',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
         }}>
-          {error}
+          <div>
+            <strong>Error:</strong> {error}
+            <div style={{ fontSize: '0.875rem', marginTop: '0.5rem', opacity: 0.8 }}>
+              Check browser console (F12) for more details
+            </div>
+          </div>
+          <button 
+            onClick={fetchInvoices}
+            style={{
+              padding: '0.625rem 1.25rem',
+              backgroundColor: '#DC2626',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontWeight: '600',
+              fontSize: '0.875rem',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            Retry
+          </button>
         </div>
       )}
 
-      {/* Search and Filters */}
       <div style={{ 
         backgroundColor: '#FFFFFF',
         padding: '1.5rem',
@@ -226,7 +274,6 @@ export default function InvoicesPage() {
         marginBottom: '2rem'
       }}>
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-          {/* Search By Dropdown */}
           <select
             value={searchBy}
             onChange={(e) => setSearchBy(e.target.value)}
@@ -256,7 +303,6 @@ export default function InvoicesPage() {
             <option value="mobile">Mobile No</option>
           </select>
 
-          {/* Search Input */}
           <div style={{ flex: 1, position: 'relative', minWidth: '250px' }}>
             <Search style={{
               position: 'absolute',
@@ -296,7 +342,6 @@ export default function InvoicesPage() {
             />
           </div>
 
-          {/* More Filters Button */}
           <button
             onClick={() => setShowFilters(!showFilters)}
             style={{
@@ -340,7 +385,6 @@ export default function InvoicesPage() {
             )}
           </button>
 
-          {/* Clear Button */}
           {(searchQuery || activeFiltersCount > 0) && (
             <button
               onClick={clearFilters}
@@ -367,7 +411,6 @@ export default function InvoicesPage() {
           )}
         </div>
 
-        {/* Filter Panel */}
         {showFilters && (
           <div style={{ 
             marginTop: '1.25rem', 
@@ -430,7 +473,6 @@ export default function InvoicesPage() {
         )}
       </div>
 
-      {/* Table */}
       <div style={{
         backgroundColor: '#FFFFFF',
         borderRadius: '16px',
@@ -454,6 +496,9 @@ export default function InvoicesPage() {
               animation: 'spin 1s linear infinite'
             }}></div>
             <p style={{ marginTop: '1.5rem', fontSize: '1.125rem', fontWeight: '500' }}>Loading invoices...</p>
+            <p style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: '#64748B' }}>
+              If this takes too long, check your MongoDB connection
+            </p>
             <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); }}`}</style>
           </div>
         ) : filteredInvoices.length === 0 ? (
@@ -513,7 +558,7 @@ export default function InvoicesPage() {
                 </tr>
               </thead>
               <tbody>
-                {filteredInvoices.map((invoice, idx) => (
+                {filteredInvoices.map((invoice) => (
                   <tr key={invoice._id} style={{
                     borderBottom: '1px solid #F1F5F9',
                     transition: 'background-color 0.2s'

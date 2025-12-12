@@ -17,6 +17,12 @@ const InvoiceSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  doctorName: {
+    type: String,
+    trim: true,
+    maxlength: 30,
+    default: ''
+  },
   items: [{
     medicineId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -54,7 +60,7 @@ const InvoiceSchema = new mongoose.Schema({
   },
   paymentMethod: {
     type: String,
-    enum: ['Cash', 'Card', 'UPI', 'POS'],
+    enum: ['Cash', 'UPI'],  // Updated: Removed 'Card' and 'POS'
     default: 'Cash'
   },
   status: {
